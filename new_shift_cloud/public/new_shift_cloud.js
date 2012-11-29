@@ -25,7 +25,7 @@
             left: "0px",
             top: "0px"
           },
-          convert: function() {
+          convertFormat: function() {
             return $cloud.point.cssInput = {
               left: "" + (Math.floor($cloud.point.x)) + "px",
               top: "" + (Math.floor($space.height - $cloud.point.y)) + "px"
@@ -77,10 +77,11 @@
         },
         update: function() {
           var radians;
+          $cloud.direction.fix();
           radians = $cloud.direction.actual * Math.PI / 180;
           $cloud.point.x += $cloud.speed.actual * Math.cos(radians);
           $cloud.point.y += $cloud.speed.actual * Math.sin(radians);
-          return $cloud.point.convert();
+          return $cloud.point.convertFormat();
         },
         doCloudShift: true,
         subShift: function() {
@@ -192,20 +193,19 @@
           });
           console.log("doCloudShift = " + $cloud.doCloudShift);
           $cloud.subShift();
-          console.log("Speed = " + $cloud.speed.actual + ", Direction = " + $cloud.direction.actual);
-          return $cloud.direction.fix();
+          return console.log("Speed = " + $cloud.speed.actual + ", Direction = " + $cloud.direction.actual);
         },
         initialize: function() {
           $cloud.point.x = rand($cloud.speed.actual, $space.width - $cloud.speed.actual);
           $cloud.point.y = rand($cloud.speed.actual, $space.height - $cloud.speed.actual);
-          $cloud.self.css($cloud.point.convert());
+          $cloud.self.css($cloud.point.convertFormat());
           return $cloud.direction.actual = rand(1, 360);
         },
         blowTheCloud: function() {
           wind.shift();
           $cloud.update();
           limit += 1;
-          if (limit <= 20) {
+          if (limit <= 100) {
             console.log(limit);
             console.log("" + $cloud.point.cssInput.left + "," + $cloud.point.cssInput.top);
             return $cloud.self.animate($cloud.point.cssInput, 100, function() {
