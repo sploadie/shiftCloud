@@ -120,23 +120,23 @@ $ ->
         if $cloud.point.x <= shiftLimits.left   && $cloud.direction.facing.left
           console.log("BOO YEAH!") #
           $cloud.doCloudShift = false
-          if $space.cloudIsOn.thetop()
-            $cloud.direction.actual += dirMod
-          else
+          if $cloud.direction.facing.up
             $cloud.direction.actual -= dirMod
+          else
+            $cloud.direction.actual += dirMod
         #RIGHT
         if $cloud.point.x >= shiftLimits.right  && $cloud.direction.facing.right
           console.log("BOO YEAH!") #
           $cloud.doCloudShift = false
-          if $space.cloudIsOn.thetop()
-            $cloud.direction.actual -= dirMod
-          else
+          if $cloud.direction.facing.up
             $cloud.direction.actual += dirMod
+          else
+            $cloud.direction.actual -= dirMod
         #BOTTOM
         if $cloud.point.y <= shiftLimits.bottom && $cloud.direction.facing.down
           console.log("BOO YEAH!") #
           $cloud.doCloudShift = false
-          if $space.cloudIsOn.theright()
+          if $cloud.direction.facing.right
             $cloud.direction.actual += dirMod
           else
             $cloud.direction.actual -= dirMod
@@ -144,7 +144,7 @@ $ ->
         if $cloud.point.y >= shiftLimits.top    && $cloud.direction.facing.up
           console.log("BOO YEAH!") #
           $cloud.doCloudShift = false
-          if $space.cloudIsOn.theright()
+          if $cloud.direction.facing.right
             $cloud.direction.actual -= dirMod
           else
             $cloud.direction.actual += dirMod
