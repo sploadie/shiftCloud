@@ -13,7 +13,6 @@ $ ->
     
     $cloud =
       self: $this
-
       point:
         x: 25
         y: 25
@@ -24,7 +23,6 @@ $ ->
           $cloud.point.cssInput =
             left: "#{Math.floor($cloud.point.x)}px"
             top: "#{Math.floor($space.height - $cloud.point.y)}px"
-
       speed:
         actual: 4 #Initial
         max: 6
@@ -58,7 +56,6 @@ $ ->
           if $cloud.direction.actual < 1
             $cloud.direction.actual += 360
             $cloud.direction.fix()
-
       update: ()->
         #Update the cloud point
         $cloud.direction.fix()
@@ -67,9 +64,7 @@ $ ->
         $cloud.point.y += $cloud.speed.actual * Math.sin(radians)
         #Update 
         $cloud.point.convertFormat()
-      
       doCloudShift: true
-      
       subShift: ()->
         #Cloud does its thing if space didn't bother.
         if $cloud.doCloudShift == true
@@ -89,27 +84,23 @@ $ ->
 
     $space =
       self: $cloud.self.offsetParent()
-      
       realWidth: $cloud.self.offsetParent().outerWidth() #Dependant on .self
       realHeight: $cloud.self.offsetParent().outerHeight() #Dependant on .self
-      
       width: $cloud.self.offsetParent().outerWidth() - $cloud.self.outerWidth() #Dependant on .realWidth
       height: $cloud.self.offsetParent().outerHeight() - $cloud.self.outerHeight() #Dependant on .realHeight
-      
       cloudIsOn:
         thetop: ()->
-          if $cloud > ($space.height/2)
+          if $cloud.point.y > ($space.height/2)
             question = true
           else
             question = false
           question
         theright: ()->
-          if $cloud > ($space.width/2)
+          if $cloud.point.x > ($space.width/2)
             question = true
           else
             question = false
           question
-      
       superShift: ()->
         $cloud.direction.facing.check()
         shiftPadding = $cloud.speed.actual #+ $cloud.direction.shiftRange #<=CHANGE THESE ACCORDING TO TESTS
@@ -152,8 +143,6 @@ $ ->
           else
             $cloud.direction.actual += dirMod
     
-    
-    
     wind =
       #Does ALL the shifting.
       shift: ()->
@@ -185,34 +174,15 @@ $ ->
         $cloud.update()
         
         limit += 1 #
-        if limit <= 100 #
+        if limit <= 10000 #
           console.log(limit) #
           console.log("#{$cloud.point.cssInput.left},#{$cloud.point.cssInput.top}") #
           
-          $cloud.self.animate $cloud.point.cssInput, 100, ->
+          $cloud.self.animate $cloud.point.cssInput, 60, ->
             wind.blowTheCloud()
-    
-    
     
     wind.initialize()
     
     limit = 0 #
     
     wind.blowTheCloud($cloud, $space)
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    

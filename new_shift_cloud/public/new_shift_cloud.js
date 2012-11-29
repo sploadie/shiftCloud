@@ -116,7 +116,7 @@
         cloudIsOn: {
           thetop: function() {
             var question;
-            if ($cloud > ($space.height / 2)) {
+            if ($cloud.point.y > ($space.height / 2)) {
               question = true;
             } else {
               question = false;
@@ -125,7 +125,7 @@
           },
           theright: function() {
             var question;
-            if ($cloud > ($space.width / 2)) {
+            if ($cloud.point.x > ($space.width / 2)) {
               question = true;
             } else {
               question = false;
@@ -205,10 +205,10 @@
           wind.shift();
           $cloud.update();
           limit += 1;
-          if (limit <= 100) {
+          if (limit <= 10000) {
             console.log(limit);
             console.log("" + $cloud.point.cssInput.left + "," + $cloud.point.cssInput.top);
-            return $cloud.self.animate($cloud.point.cssInput, 100, function() {
+            return $cloud.self.animate($cloud.point.cssInput, 60, function() {
               return wind.blowTheCloud();
             });
           }
