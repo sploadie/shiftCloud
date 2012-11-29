@@ -34,6 +34,23 @@ $ ->
       direction:
         actual: 25
         shiftRange: 10 #X2
+        facing:
+          check: ()->
+            #Update which two directions the cloud is "facing"
+            $cloud.direction.facing.left = false; $cloud.direction.facing.right = false
+            $cloud.direction.facing.up   = false; $cloud.direction.facing.down  = false
+            if 90 < $cloud.direction.actual < 270
+              $cloud.direction.facing.left  = true
+            else
+              $cloud.direction.facing.right = true
+            if  0 < $cloud.direction.actual < 180
+              $cloud.direction.facing.up    = true
+            else
+              $cloud.direction.facing.down  = true
+          up: false
+          right: false
+          down: false
+          left: false
         fix: ()->
           if $cloud.direction.actual > 360
             $cloud.direction.actual -= 360
@@ -43,7 +60,6 @@ $ ->
             $cloud.direction.fix()
 
       update: ()->
-        #Update which two directions the cloud is "facing"
         #Update the cloud point
         radians = $cloud.direction.actual * Math.PI / 180
         $cloud.point.x += $cloud.speed.actual * Math.cos(radians)
@@ -102,28 +118,28 @@ $ ->
           left: shiftPadding
         dirMod = $cloud.direction.shiftRange #<======================CHANGE THESE ACCORDING TO TESTS
         #LEFT
-        if $cloud.point.x <= shiftLimits.left   && (360 - dirMod) < $cloud.direction.actual < (360 + dirMod)
+        if $cloud.point.x <= shiftLimits.left   && $cloud.direction.facing.left
           $cloud.doCloudShift = false
           if $space.cloudIsOn.thetop()
             $cloud.direction.actual += dirMod
           else
             $cloud.direction.actual -= dirMod
         #RIGHT
-        if $cloud.point.x >= shiftLimits.right  && (180 - dirMod) < $cloud.direction.actual < (180 + dirMod)
+        if $cloud.point.x >= shiftLimits.right  && $cloud.direction.facing.right
           $cloud.doCloudShift = false
           if $space.cloudIsOn.thetop()
             $cloud.direction.actual -= dirMod
           else
             $cloud.direction.actual += dirMod
         #BOTTOM
-        if $cloud.point.y <= shiftLimits.bottom && ( 90 - dirMod) < $cloud.direction.actual < ( 90 + dirMod)
+        if $cloud.point.y <= shiftLimits.bottom && $cloud.direction.facing.down
           $cloud.doCloudShift = false
           if $space.cloudIsOn.theright()
             $cloud.direction.actual += dirMod
           else
             $cloud.direction.actual -= dirMod
         #TOP
-        if $cloud.point.y >= shiftLimits.top    && (270 - dirMod) < $cloud.direction.actual < (270 + dirMod)
+        if $cloud.point.y >= shiftLimits.top    && $cloud.direction.facing.up
           $cloud.doCloudShift = false
           if $space.cloudIsOn.theright()
             $cloud.direction.actual -= dirMod
@@ -135,6 +151,9 @@ $ ->
     wind =
       #Does ALL the shifting.
       shift: ()->
+        
+        $cloud.direction.facing.check()
+        
         $space.superShift()
         
         $("#space > #shiftPadding").css #
