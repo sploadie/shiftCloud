@@ -34,14 +34,15 @@ $ ->
         shiftRange: 10 #X2
         facing:
           check: ()->
+            $cloud.direction.fix()
             #Update which two directions the cloud is "facing"
             $cloud.direction.facing.left = false; $cloud.direction.facing.right = false
             $cloud.direction.facing.up   = false; $cloud.direction.facing.down  = false
-            if 90 < $cloud.direction.actual < 270
+            if 90 < $cloud.direction.actual <= 270
               $cloud.direction.facing.left  = true
             else
               $cloud.direction.facing.right = true
-            if  0 < $cloud.direction.actual < 180
+            if  0 < $cloud.direction.actual <= 180
               $cloud.direction.facing.up    = true
             else
               $cloud.direction.facing.down  = true
@@ -56,15 +57,18 @@ $ ->
           if $cloud.direction.actual < 1
             $cloud.direction.actual += 360
             $cloud.direction.fix()
+      
       update: ()->
         #Update the cloud point
         $cloud.direction.fix()
         radians = $cloud.direction.actual * Math.PI / 180
         $cloud.point.x += $cloud.speed.actual * Math.cos(radians)
         $cloud.point.y += $cloud.speed.actual * Math.sin(radians)
-        #Update 
+        #Update
         $cloud.point.convertFormat()
+      
       doCloudShift: true
+      
       subShift: ()->
         #Cloud does its thing if space didn't bother.
         if $cloud.doCloudShift == true
@@ -88,6 +92,7 @@ $ ->
       realHeight: $cloud.self.offsetParent().outerHeight() #Dependant on .self
       width: $cloud.self.offsetParent().outerWidth() - $cloud.self.outerWidth() #Dependant on .realWidth
       height: $cloud.self.offsetParent().outerHeight() - $cloud.self.outerHeight() #Dependant on .realHeight
+      
       cloudIsOn:
         thetop: ()->
           if $cloud.point.y > ($space.height/2)
@@ -101,6 +106,7 @@ $ ->
           else
             question = false
           question
+      
       superShift: ()->
         $cloud.direction.facing.check()
         shiftPadding = $cloud.speed.actual #+ $cloud.direction.shiftRange #<=CHANGE THESE ACCORDING TO TESTS
@@ -144,23 +150,21 @@ $ ->
             $cloud.direction.actual += dirMod
     
     wind =
-      #Does ALL the shifting.
       shift: ()->
         
         $space.superShift()
         
-        $("#space > #shiftPadding").css #
-          left:   "#{Math.floor($cloud.speed.actual)}px" #
-          top:    "#{Math.floor($cloud.speed.actual)}px" #
-          width:  "#{Math.floor($space.width - ($cloud.speed.actual) * 2.0)}" #
-          height: "#{Math.floor($space.height - ($cloud.speed.actual) * 2.0)}" #
         console.log("doCloudShift = #{$cloud.doCloudShift}") #
         
         $cloud.subShift()
         
         console.log("Speed = #{$cloud.speed.actual}, Direction = #{$cloud.direction.actual}") #
+        $("#space > #shiftPadding").css #
+          left:   "#{Math.floor($cloud.speed.actual)}px" #
+          top:    "#{Math.floor($cloud.speed.actual)}px" #
+          width:  "#{Math.floor($space.width - ($cloud.speed.actual) * 2.0)}" #
+          height: "#{Math.floor($space.height - ($cloud.speed.actual) * 2.0)}" #
       
-      #Create cloud beginning position and direction
       initialize: ()->
         $cloud.point.x = rand($cloud.speed.actual, ($space.width-$cloud.speed.actual))
         $cloud.point.y = rand($cloud.speed.actual, ($space.height-$cloud.speed.actual))
@@ -174,7 +178,7 @@ $ ->
         $cloud.update()
         
         limit += 1 #
-        if limit <= 10000 #
+        if limit <= 1000 #
           console.log(limit) #
           console.log("#{$cloud.point.cssInput.left},#{$cloud.point.cssInput.top}") #
           

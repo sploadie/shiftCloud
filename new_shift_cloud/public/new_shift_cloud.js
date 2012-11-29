@@ -44,16 +44,17 @@
           facing: {
             check: function() {
               var _ref, _ref1;
+              $cloud.direction.fix();
               $cloud.direction.facing.left = false;
               $cloud.direction.facing.right = false;
               $cloud.direction.facing.up = false;
               $cloud.direction.facing.down = false;
-              if ((90 < (_ref = $cloud.direction.actual) && _ref < 270)) {
+              if ((90 < (_ref = $cloud.direction.actual) && _ref <= 270)) {
                 $cloud.direction.facing.left = true;
               } else {
                 $cloud.direction.facing.right = true;
               }
-              if ((0 < (_ref1 = $cloud.direction.actual) && _ref1 < 180)) {
+              if ((0 < (_ref1 = $cloud.direction.actual) && _ref1 <= 180)) {
                 return $cloud.direction.facing.up = true;
               } else {
                 return $cloud.direction.facing.down = true;
@@ -185,15 +186,15 @@
       wind = {
         shift: function() {
           $space.superShift();
-          $("#space > #shiftPadding").css({
+          console.log("doCloudShift = " + $cloud.doCloudShift);
+          $cloud.subShift();
+          console.log("Speed = " + $cloud.speed.actual + ", Direction = " + $cloud.direction.actual);
+          return $("#space > #shiftPadding").css({
             left: "" + (Math.floor($cloud.speed.actual)) + "px",
             top: "" + (Math.floor($cloud.speed.actual)) + "px",
             width: "" + (Math.floor($space.width - $cloud.speed.actual * 2.0)),
             height: "" + (Math.floor($space.height - $cloud.speed.actual * 2.0))
           });
-          console.log("doCloudShift = " + $cloud.doCloudShift);
-          $cloud.subShift();
-          return console.log("Speed = " + $cloud.speed.actual + ", Direction = " + $cloud.direction.actual);
         },
         initialize: function() {
           $cloud.point.x = rand($cloud.speed.actual, $space.width - $cloud.speed.actual);
@@ -205,7 +206,7 @@
           wind.shift();
           $cloud.update();
           limit += 1;
-          if (limit <= 10000) {
+          if (limit <= 1000) {
             console.log(limit);
             console.log("" + $cloud.point.cssInput.left + "," + $cloud.point.cssInput.top);
             return $cloud.self.animate($cloud.point.cssInput, 60, function() {
