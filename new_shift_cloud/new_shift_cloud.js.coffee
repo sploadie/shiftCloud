@@ -106,20 +106,21 @@ $ ->
           else
             question = false
           question
-      
       superShift: ()->
         $cloud.direction.facing.check()
-        shiftPadding = $cloud.speed.actual #+ $cloud.direction.shiftRange #<=CHANGE THESE ACCORDING TO TESTS
+        shiftPadding = $cloud.speed.actual * 3 #+ $cloud.direction.shiftRange #<=CHANGE THESE ACCORDING TO TESTS
         shiftLimits =
           top: $space.height - shiftPadding
           right: $space.width - shiftPadding
           bottom: shiftPadding
           left: shiftPadding
+        corner = false
         dirMod = $cloud.direction.shiftRange #<======================CHANGE THESE ACCORDING TO TESTS
         #LEFT
         if $cloud.point.x <= shiftLimits.left   && $cloud.direction.facing.left
           console.log("BOO YEAH!") #
           $cloud.doCloudShift = false
+          corner = true
           if $cloud.direction.facing.up
             $cloud.direction.actual -= dirMod
           else
@@ -128,10 +129,12 @@ $ ->
         if $cloud.point.x >= shiftLimits.right  && $cloud.direction.facing.right
           console.log("BOO YEAH!") #
           $cloud.doCloudShift = false
+          corner = true
           if $cloud.direction.facing.up
             $cloud.direction.actual += dirMod
           else
             $cloud.direction.actual -= dirMod
+        if corner then dirMod = dirMod * -1
         #BOTTOM
         if $cloud.point.y <= shiftLimits.bottom && $cloud.direction.facing.down
           console.log("BOO YEAH!") #
@@ -160,10 +163,10 @@ $ ->
         
         console.log("Speed = #{$cloud.speed.actual}, Direction = #{$cloud.direction.actual}") #
         $("#space > #shiftPadding").css #
-          left:   "#{Math.floor($cloud.speed.actual)}px" #
-          top:    "#{Math.floor($cloud.speed.actual)}px" #
-          width:  "#{Math.floor($space.width - ($cloud.speed.actual) * 2.0)}" #
-          height: "#{Math.floor($space.height - ($cloud.speed.actual) * 2.0)}" #
+          left:   "#{Math.floor($cloud.speed.actual * 3)}px" #
+          top:    "#{Math.floor($cloud.speed.actual * 3)}px" #
+          width:  "#{Math.floor($space.width - ($cloud.speed.actual * 3) * 2.0)}" #
+          height: "#{Math.floor($space.height - ($cloud.speed.actual * 3) * 2.0)}" #
       
       initialize: ()->
         $cloud.point.x = rand($cloud.speed.actual, ($space.width-$cloud.speed.actual))
