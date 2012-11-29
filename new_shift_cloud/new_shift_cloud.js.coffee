@@ -21,10 +21,9 @@ $ ->
           left: "0px"
           top:  "0px"
         convert: ()->
-          $cloud.point.cssInput = {
-              left: "#{Math.floor($cloud.point.x)}px"
-              top: "#{Math.floor($space.height - $cloud.point.y)}px"
-            }
+          $cloud.point.cssInput =
+            left: "#{Math.floor($cloud.point.x)}px"
+            top: "#{Math.floor($space.height - $cloud.point.y)}px"
 
       speed:
         actual: 4 #Initial
