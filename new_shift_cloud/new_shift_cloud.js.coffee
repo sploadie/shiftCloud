@@ -110,6 +110,7 @@ $ ->
           question
       
       superShift: ()->
+        $cloud.direction.facing.check()
         shiftPadding = $cloud.speed.actual #+ $cloud.direction.shiftRange #<=CHANGE THESE ACCORDING TO TESTS
         shiftLimits =
           top: $space.height - shiftPadding
@@ -119,6 +120,7 @@ $ ->
         dirMod = $cloud.direction.shiftRange #<======================CHANGE THESE ACCORDING TO TESTS
         #LEFT
         if $cloud.point.x <= shiftLimits.left   && $cloud.direction.facing.left
+          console.log("BOO YEAH!") #
           $cloud.doCloudShift = false
           if $space.cloudIsOn.thetop()
             $cloud.direction.actual += dirMod
@@ -126,6 +128,7 @@ $ ->
             $cloud.direction.actual -= dirMod
         #RIGHT
         if $cloud.point.x >= shiftLimits.right  && $cloud.direction.facing.right
+          console.log("BOO YEAH!") #
           $cloud.doCloudShift = false
           if $space.cloudIsOn.thetop()
             $cloud.direction.actual -= dirMod
@@ -133,6 +136,7 @@ $ ->
             $cloud.direction.actual += dirMod
         #BOTTOM
         if $cloud.point.y <= shiftLimits.bottom && $cloud.direction.facing.down
+          console.log("BOO YEAH!") #
           $cloud.doCloudShift = false
           if $space.cloudIsOn.theright()
             $cloud.direction.actual += dirMod
@@ -140,6 +144,7 @@ $ ->
             $cloud.direction.actual -= dirMod
         #TOP
         if $cloud.point.y >= shiftLimits.top    && $cloud.direction.facing.up
+          console.log("BOO YEAH!") #
           $cloud.doCloudShift = false
           if $space.cloudIsOn.theright()
             $cloud.direction.actual -= dirMod
@@ -151,8 +156,6 @@ $ ->
     wind =
       #Does ALL the shifting.
       shift: ()->
-        
-        $cloud.direction.facing.check()
         
         $space.superShift()
         
