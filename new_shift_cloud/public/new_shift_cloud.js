@@ -211,11 +211,11 @@
       };
       wind = {
         initialize: function() {
-          $cloud.point.x = rand($cloud.speed.actual, $space.width - $cloud.speed.actual);
-          $cloud.point.y = rand($cloud.speed.actual, $space.height - $cloud.speed.actual);
+          $space.setShiftLimits();
+          $cloud.point.x = rand($space.shiftLimits.left, $space.shiftLimits.right);
+          $cloud.point.y = rand($space.shiftLimits.bottom, $space.shiftLimits.top);
           $cloud.self.css($cloud.point.convertFormat());
-          $cloud.direction.actual = rand(1, 360);
-          return $space.setShiftLimits();
+          return $cloud.direction.actual = rand(1, 360);
         },
         blowTheCloud: function() {
           $space.superShift();
