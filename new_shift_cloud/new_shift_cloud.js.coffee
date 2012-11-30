@@ -65,16 +65,6 @@ $ ->
         $cloud.point.x += $cloud.speed.actual * Math.cos(radians)
         $cloud.point.y += $cloud.speed.actual * Math.sin(radians)
         $cloud.point.convertFormat()
-      
-      subShift: ()->
-        unless $cloud.speed.max == $cloud.speed.min
-          switch $cloud.speed.actual
-            when $cloud.speed.max then $cloud.speed.actual -= rand(1, $cloud.speed.shiftRange)
-            when $cloud.speed.min then $cloud.speed.actual += rand(1, $cloud.speed.shiftRange)
-            else $cloud.speed.actual += rand(($cloud.speed.shiftRange * -1), $cloud.speed.shiftRange)
-          if $cloud.speed.actual > $cloud.speed.max then $cloud.speed.actual = $cloud.speed.max
-          else if $cloud.speed.actual < $cloud.speed.min then $cloud.speed.actual = $cloud.speed.min
-        $cloud.direction.actual += rand(($cloud.direction.shiftRange * -1), $cloud.direction.shiftRange)
 
     $space =
       self: $cloud.self.offsetParent()
@@ -122,39 +112,44 @@ $ ->
         bottom: 0
         left:   0
       
-      superShift: ()->
+    shift =
+      
+      changeDir: 0
+      dirMod: 0
+      
+      ClockwiseIf: (bool)->
+        if bool is true then shift.changeDir -= shift.dirMod
+        else shift.changeDir += shift.dirMod
+      
+      CounterclockwiseIf: (bool)->
+        if bool is true then shift.changeDir += shift.dirMod
+        else shift.changeDir -= shift.dirMod
+      
+      cloudRandomly: ()->
+        unless $cloud.speed.max == $cloud.speed.min
+          switch $cloud.speed.actual
+            when $cloud.speed.max then $cloud.speed.actual -= rand(1, $cloud.speed.shiftRange)
+            when $cloud.speed.min then $cloud.speed.actual += rand(1, $cloud.speed.shiftRange)
+            else $cloud.speed.actual += rand(($cloud.speed.shiftRange * -1), $cloud.speed.shiftRange)
+          if $cloud.speed.actual > $cloud.speed.max then $cloud.speed.actual = $cloud.speed.max
+          else if $cloud.speed.actual < $cloud.speed.min then $cloud.speed.actual = $cloud.speed.min
+        $cloud.direction.actual += rand(($cloud.direction.shiftRange * -1), $cloud.direction.shiftRange)
+      
+      begin: ()->
         $cloud.direction.facing.check()
-        doCloudShift = true
-        corner = false
-        dirMod = $cloud.direction.shiftRange
+        shift.changeDir = 0
+        shift.dirMod = $cloud.direction.shiftRange
         if $cloud.point.x <= $space.shiftLimits.left   && $cloud.direction.facing.left
-          doCloudShift = false
-          corner = true
-          if $cloud.direction.facing.up
-            $cloud.direction.actual -= dirMod
-          else
-            $cloud.direction.actual += dirMod
+          shift.ClockwiseIf $cloud.direction.facing.up
         if $cloud.point.x >= $space.shiftLimits.right  && $cloud.direction.facing.right
-          doCloudShift = false
-          corner = true
-          if $cloud.direction.facing.up
-            $cloud.direction.actual += dirMod
-          else
-            $cloud.direction.actual -= dirMod
-        if corner then dirMod = dirMod * -1
+          shift.CounterclockwiseIf $cloud.direction.facing.up
+        if shift.changeDir isnt 0 then shift.dirMod = shift.dirMod * -1
         if $cloud.point.y <= $space.shiftLimits.bottom && $cloud.direction.facing.down
-          doCloudShift = false
-          if $cloud.direction.facing.right
-            $cloud.direction.actual += dirMod
-          else
-            $cloud.direction.actual -= dirMod
+          shift.CounterclockwiseIf $cloud.direction.facing.right
         if $cloud.point.y >= $space.shiftLimits.top    && $cloud.direction.facing.up
-          doCloudShift = false
-          if $cloud.direction.facing.right
-            $cloud.direction.actual -= dirMod
-          else
-            $cloud.direction.actual += dirMod
-        if doCloudShift == true then $cloud.subShift()
+          shift.ClockwiseIf $cloud.direction.facing.right
+        if shift.changeDir isnt 0 then $cloud.direction.actual += shift.changeDir
+        else shift.cloudRandomly()
 
     wind =
       
@@ -166,7 +161,7 @@ $ ->
         $cloud.direction.actual = rand(1, 360)
       
       blowTheCloud: ()->
-        $space.superShift()
+        shift.begin()
         $cloud.update()
         limit += 1 #
         if limit <= 500 #
