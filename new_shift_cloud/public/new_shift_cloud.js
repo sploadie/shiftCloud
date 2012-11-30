@@ -19,8 +19,8 @@
       $cloud = {
         self: $this,
         point: {
-          x: 25,
-          y: 25,
+          x: 0,
+          y: 0,
           cssInput: {
             left: "0px",
             top: "0px"
@@ -39,7 +39,7 @@
           shiftRange: 1
         },
         direction: {
-          actual: 25,
+          actual: 0,
           shiftRange: 10,
           facing: {
             check: function() {
@@ -133,6 +133,36 @@
             }
             return question;
           }
+        },
+        setShiftLimits: function() {
+          var angle, dist, distances, radians, shiftPadding;
+          angle = 0;
+          distances = [];
+          shiftPadding = 0;
+          while (angle < 180) {
+            angle += $cloud.direction.shiftRange;
+            if (angle < 180) {
+              radians = angle * (Math.PI / 180);
+              dist = Math.sin(radians) * $cloud.speed.actual;
+              distances.push(dist);
+            } else {
+              shiftPadding = Math.floor(distances.reduce(function(x, y) {
+                return x + y;
+              })) + 1;
+            }
+          }
+          return $space.shiftLimits = {
+            top: $space.height - shiftPadding,
+            right: $space.width - shiftPadding,
+            bottom: shiftPadding,
+            left: shiftPadding
+          };
+        },
+        shiftLimits: {
+          top: 0,
+          right: 0,
+          bottom: 0,
+          left: 0
         },
         superShift: function() {
           var corner, dirMod, shiftLimits, shiftPadding;

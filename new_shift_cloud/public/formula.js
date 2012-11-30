@@ -5,10 +5,9 @@
 
   speed = 4;
 
-  setPadding = function() {
-    var angle, dist, distances, radians, string, _results;
+  setPadding = function(speed, angleChange) {
+    var angle, dist, distances, radians, _results;
     angle = 0;
-    string = [];
     distances = [];
     _results = [];
     while (angle < 180) {
@@ -26,6 +25,6 @@
     return _results;
   };
 
-  setPadding();
+  setPadding(speed, shiftRange);
 
 }).call(this);

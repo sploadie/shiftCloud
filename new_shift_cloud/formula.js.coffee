@@ -1,9 +1,8 @@
 shiftRange = 10
 speed = 4
 
-setPadding = ()->
+setPadding = (speed,angleChange)->
   angle = 0
-  string = []
   distances = []
   while angle < 180
     angle += shiftRange
@@ -14,4 +13,4 @@ setPadding = ()->
     else
       alert( Math.floor(distances.reduce (x,y) -> x + y) + 1 )
 
-setPadding()
+setPadding(speed, shiftRange)

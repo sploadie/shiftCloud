@@ -14,8 +14,8 @@ $ ->
     $cloud =
       self: $this
       point:
-        x: 25
-        y: 25
+        x: 0
+        y: 0
         cssInput:
           left: "0px"
           top:  "0px"
@@ -23,6 +23,7 @@ $ ->
           $cloud.point.cssInput =
             left: "#{Math.floor($cloud.point.x)}px"
             top: "#{Math.floor($space.height - $cloud.point.y)}px"
+      
       speed:
         actual: 4 #Initial
         max: 4
@@ -30,7 +31,7 @@ $ ->
         shiftRange: 1 #X2
 
       direction:
-        actual: 25
+        actual: 0
         shiftRange: 10 #X2
         facing:
           check: ()->
@@ -106,6 +107,31 @@ $ ->
           else
             question = false
           question
+      
+      setShiftLimits: ()->
+        angle = 0
+        distances = []
+        shiftPadding = 0
+        while angle < 180
+          angle += $cloud.direction.shiftRange
+          if angle < 180
+            radians = angle * (Math.PI / 180)
+            dist = Math.sin(radians)*$cloud.speed.actual
+            distances.push(dist)
+          else
+            shiftPadding = Math.floor(distances.reduce (x,y) -> x + y) + 1
+        $space.shiftLimits =
+          top: $space.height - shiftPadding
+          right: $space.width - shiftPadding
+          bottom: shiftPadding
+          left: shiftPadding
+      
+      shiftLimits:
+        top: 0
+        right: 0
+        bottom: 0
+        left: 0
+      
       superShift: ()->
         $cloud.direction.facing.check()
         shiftPadding = $cloud.speed.actual * 5 #+ $cloud.direction.shiftRange #<=CHANGE THESE ACCORDING TO TESTS
