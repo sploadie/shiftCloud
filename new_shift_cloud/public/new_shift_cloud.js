@@ -90,26 +90,14 @@
         realWidth: $cloud.self.offsetParent().outerWidth(),
         realHeight: $cloud.self.offsetParent().outerHeight(),
         width: $cloud.self.offsetParent().outerWidth() - $cloud.self.outerWidth(),
-        height: $cloud.self.offsetParent().outerHeight() - $cloud.self.outerHeight(),
-        cloudIsOn: {
-          thetop: function() {
-            var question;
-            if ($cloud.point.y > ($space.height / 2)) {
-              question = true;
-            } else {
-              question = false;
-            }
-            return question;
-          },
-          theright: function() {
-            var question;
-            if ($cloud.point.x > ($space.width / 2)) {
-              question = true;
-            } else {
-              question = false;
-            }
-            return question;
-          }
+        height: $cloud.self.offsetParent().outerHeight() - $cloud.self.outerHeight()
+      };
+      shift = {
+        shiftLimits: {
+          top: 0,
+          right: 0,
+          bottom: 0,
+          left: 0
         },
         setShiftLimits: function() {
           var angle, dist, distances, radians, shiftPadding;
@@ -128,21 +116,13 @@
               })) + 1;
             }
           }
-          return $space.shiftLimits = {
+          return shift.shiftLimits = {
             top: $space.height - shiftPadding,
             right: $space.width - shiftPadding,
             bottom: shiftPadding,
             left: shiftPadding
           };
         },
-        shiftLimits: {
-          top: 0,
-          right: 0,
-          bottom: 0,
-          left: 0
-        }
-      };
-      shift = {
         changeDir: 0,
         dirMod: 0,
         ClockwiseIf: function(bool) {
@@ -157,6 +137,31 @@
             return shift.changeDir += shift.dirMod;
           } else {
             return shift.changeDir -= shift.dirMod;
+          }
+        },
+        begin: function() {
+          $cloud.direction.facing.check();
+          shift.changeDir = 0;
+          shift.dirMod = $cloud.direction.shiftRange;
+          if ($cloud.point.x <= shift.shiftLimits.left && $cloud.direction.facing.left) {
+            shift.ClockwiseIf($cloud.direction.facing.up);
+          }
+          if ($cloud.point.x >= shift.shiftLimits.right && $cloud.direction.facing.right) {
+            shift.CounterclockwiseIf($cloud.direction.facing.up);
+          }
+          if (shift.changeDir !== 0) {
+            shift.dirMod = shift.dirMod * -1;
+          }
+          if ($cloud.point.y <= shift.shiftLimits.bottom && $cloud.direction.facing.down) {
+            shift.CounterclockwiseIf($cloud.direction.facing.right);
+          }
+          if ($cloud.point.y >= shift.shiftLimits.top && $cloud.direction.facing.up) {
+            shift.ClockwiseIf($cloud.direction.facing.right);
+          }
+          if (shift.changeDir !== 0) {
+            return $cloud.direction.actual += shift.changeDir;
+          } else {
+            return shift.cloudRandomly();
           }
         },
         cloudRandomly: function() {
@@ -178,38 +183,13 @@
             }
           }
           return $cloud.direction.actual += rand($cloud.direction.shiftRange * -1, $cloud.direction.shiftRange);
-        },
-        begin: function() {
-          $cloud.direction.facing.check();
-          shift.changeDir = 0;
-          shift.dirMod = $cloud.direction.shiftRange;
-          if ($cloud.point.x <= $space.shiftLimits.left && $cloud.direction.facing.left) {
-            shift.ClockwiseIf($cloud.direction.facing.up);
-          }
-          if ($cloud.point.x >= $space.shiftLimits.right && $cloud.direction.facing.right) {
-            shift.CounterclockwiseIf($cloud.direction.facing.up);
-          }
-          if (shift.changeDir !== 0) {
-            shift.dirMod = shift.dirMod * -1;
-          }
-          if ($cloud.point.y <= $space.shiftLimits.bottom && $cloud.direction.facing.down) {
-            shift.CounterclockwiseIf($cloud.direction.facing.right);
-          }
-          if ($cloud.point.y >= $space.shiftLimits.top && $cloud.direction.facing.up) {
-            shift.ClockwiseIf($cloud.direction.facing.right);
-          }
-          if (shift.changeDir !== 0) {
-            return $cloud.direction.actual += shift.changeDir;
-          } else {
-            return shift.cloudRandomly();
-          }
         }
       };
       wind = {
         initialize: function() {
-          $space.setShiftLimits();
-          $cloud.point.x = rand($space.shiftLimits.left, $space.shiftLimits.right);
-          $cloud.point.y = rand($space.shiftLimits.bottom, $space.shiftLimits.top);
+          shift.setShiftLimits();
+          $cloud.point.x = rand(shift.shiftLimits.left, shift.shiftLimits.right);
+          $cloud.point.y = rand(shift.shiftLimits.bottom, shift.shiftLimits.top);
           $cloud.self.css($cloud.point.convertFormat());
           return $cloud.direction.actual = rand(1, 360);
         },
