@@ -206,7 +206,7 @@ $ ->
           console.log(limit) #
           console.log("#{$cloud.point.cssInput.left},#{$cloud.point.cssInput.top}") #
           
-          $cloud.self.animate $cloud.point.cssInput, 30, ->
+          $cloud.self.animate $cloud.point.cssInput, 60, ->
             wind.blowTheCloud()
     
     wind.initialize()

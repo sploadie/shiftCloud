@@ -239,7 +239,7 @@
           if (limit <= 1000) {
             console.log(limit);
             console.log("" + $cloud.point.cssInput.left + "," + $cloud.point.cssInput.top);
-            return $cloud.self.animate($cloud.point.cssInput, 30, function() {
+            return $cloud.self.animate($cloud.point.cssInput, 60, function() {
               return wind.blowTheCloud();
             });
           }
