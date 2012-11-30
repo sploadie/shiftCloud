@@ -14,19 +14,16 @@
       return Math.floor(Math.random() * ((max + 1) - min)) + min;
     };
     return $("#space img").each(function() {
-      var $cloud, $space, $this, limit, shift, wind;
+      var $cloud, $space, $this, shift, wind;
       $this = $(this);
       $cloud = {
         self: $this,
         point: {
           x: 0,
           y: 0,
-          cssInput: {
-            left: "0px",
-            top: "0px"
-          },
           convertFormat: function() {
-            return $cloud.point.cssInput = {
+            var cssInput;
+            return cssInput = {
               left: "" + (Math.floor($cloud.point.x)) + "px",
               top: "" + (Math.floor($space.height - $cloud.point.y)) + "px"
             };
@@ -198,18 +195,12 @@
         },
         blowTheCloud: function() {
           shift.begin();
-          $cloud.update();
-          limit += 1;
-          if (limit <= 500) {
-            console.log(limit);
-            return $cloud.self.animate($cloud.point.cssInput, 60, function() {
-              return wind.blowTheCloud();
-            });
-          }
+          return $cloud.self.animate($cloud.update(), 60, function() {
+            return wind.blowTheCloud();
+          });
         }
       };
       wind.initialize();
-      limit = 0;
       return wind.blowTheCloud($cloud, $space);
     });
   });

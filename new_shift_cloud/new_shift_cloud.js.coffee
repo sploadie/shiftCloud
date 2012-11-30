@@ -16,11 +16,8 @@ $ ->
       point:
         x: 0
         y: 0
-        cssInput:
-          left: "0px"
-          top:  "0px"
         convertFormat: ()->
-          $cloud.point.cssInput =
+          cssInput =
             left: "#{Math.floor($cloud.point.x)}px"
             top: "#{Math.floor($space.height - $cloud.point.y)}px"
       speed:
@@ -128,7 +125,6 @@ $ ->
         $cloud.speed.changeRandomly
 
     wind =
-      
       initialize: ()->
         shift.setShiftLimits()
         $cloud.point.x = rand(shift.shiftLimits.left, (shift.shiftLimits.right))
@@ -137,13 +133,8 @@ $ ->
         $cloud.direction.actual = rand(1, 360)
       blowTheCloud: ()->
         shift.begin()
-        $cloud.update()
-        limit += 1 #
-        if limit <= 500 #
-          console.log(limit) #
-          $cloud.self.animate $cloud.point.cssInput, 60, ->
-            wind.blowTheCloud()
+        $cloud.self.animate $cloud.update(), 60, ->
+          wind.blowTheCloud()
     
     wind.initialize()
-    limit = 0 #
     wind.blowTheCloud($cloud, $space)
