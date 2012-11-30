@@ -84,30 +84,25 @@
           $cloud.point.y += $cloud.speed.actual * Math.sin(radians);
           return $cloud.point.convertFormat();
         },
-        doCloudShift: true,
         subShift: function() {
-          if ($cloud.doCloudShift === true) {
-            if ($cloud.speed.max !== $cloud.speed.min) {
-              switch ($cloud.speed.actual) {
-                case $cloud.speed.max:
-                  $cloud.speed.actual -= rand(1, $cloud.speed.shiftRange);
-                  break;
-                case $cloud.speed.min:
-                  $cloud.speed.actual += rand(1, $cloud.speed.shiftRange);
-                  break;
-                default:
-                  $cloud.speed.actual += rand($cloud.speed.shiftRange * -1, $cloud.speed.shiftRange);
-              }
-              if ($cloud.speed.actual > $cloud.speed.max) {
-                $cloud.speed.actual = $cloud.speed.max;
-              } else if ($cloud.speed.actual < $cloud.speed.min) {
-                $cloud.speed.actual = $cloud.speed.min;
-              }
+          if ($cloud.speed.max !== $cloud.speed.min) {
+            switch ($cloud.speed.actual) {
+              case $cloud.speed.max:
+                $cloud.speed.actual -= rand(1, $cloud.speed.shiftRange);
+                break;
+              case $cloud.speed.min:
+                $cloud.speed.actual += rand(1, $cloud.speed.shiftRange);
+                break;
+              default:
+                $cloud.speed.actual += rand($cloud.speed.shiftRange * -1, $cloud.speed.shiftRange);
             }
-            return $cloud.direction.actual += rand($cloud.direction.shiftRange * -1, $cloud.direction.shiftRange);
-          } else {
-            return $cloud.doCloudShift = true;
+            if ($cloud.speed.actual > $cloud.speed.max) {
+              $cloud.speed.actual = $cloud.speed.max;
+            } else if ($cloud.speed.actual < $cloud.speed.min) {
+              $cloud.speed.actual = $cloud.speed.min;
+            }
           }
+          return $cloud.direction.actual += rand($cloud.direction.shiftRange * -1, $cloud.direction.shiftRange);
         }
       };
       $space = {
@@ -167,12 +162,13 @@
           left: 0
         },
         superShift: function() {
-          var corner, dirMod;
+          var corner, dirMod, doCloudShift;
           $cloud.direction.facing.check();
+          doCloudShift = true;
           corner = false;
           dirMod = $cloud.direction.shiftRange;
           if ($cloud.point.x <= $space.shiftLimits.left && $cloud.direction.facing.left) {
-            $cloud.doCloudShift = false;
+            doCloudShift = false;
             corner = true;
             if ($cloud.direction.facing.up) {
               $cloud.direction.actual -= dirMod;
@@ -181,7 +177,7 @@
             }
           }
           if ($cloud.point.x >= $space.shiftLimits.right && $cloud.direction.facing.right) {
-            $cloud.doCloudShift = false;
+            doCloudShift = false;
             corner = true;
             if ($cloud.direction.facing.up) {
               $cloud.direction.actual += dirMod;
@@ -193,7 +189,7 @@
             dirMod = dirMod * -1;
           }
           if ($cloud.point.y <= $space.shiftLimits.bottom && $cloud.direction.facing.down) {
-            $cloud.doCloudShift = false;
+            doCloudShift = false;
             if ($cloud.direction.facing.right) {
               $cloud.direction.actual += dirMod;
             } else {
@@ -201,20 +197,19 @@
             }
           }
           if ($cloud.point.y >= $space.shiftLimits.top && $cloud.direction.facing.up) {
-            $cloud.doCloudShift = false;
+            doCloudShift = false;
             if ($cloud.direction.facing.right) {
-              return $cloud.direction.actual -= dirMod;
+              $cloud.direction.actual -= dirMod;
             } else {
-              return $cloud.direction.actual += dirMod;
+              $cloud.direction.actual += dirMod;
             }
+          }
+          if (doCloudShift === true) {
+            return $cloud.subShift();
           }
         }
       };
       wind = {
-        shift: function() {
-          $space.superShift();
-          return $cloud.subShift();
-        },
         initialize: function() {
           $cloud.point.x = rand($cloud.speed.actual, $space.width - $cloud.speed.actual);
           $cloud.point.y = rand($cloud.speed.actual, $space.height - $cloud.speed.actual);
@@ -223,7 +218,7 @@
           return $space.setShiftLimits();
         },
         blowTheCloud: function() {
-          wind.shift();
+          $space.superShift();
           $cloud.update();
           limit += 1;
           if (limit <= 500) {
