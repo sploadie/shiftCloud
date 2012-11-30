@@ -36,7 +36,26 @@
           actual: 5,
           max: 5,
           min: 5,
-          shiftRange: 1
+          shiftRange: 1,
+          changeRandomly: function() {
+            if ($cloud.speed.max !== $cloud.speed.min) {
+              switch ($cloud.speed.actual) {
+                case $cloud.speed.max:
+                  $cloud.speed.actual -= rand(1, $cloud.speed.shiftRange);
+                  break;
+                case $cloud.speed.min:
+                  $cloud.speed.actual += rand(1, $cloud.speed.shiftRange);
+                  break;
+                default:
+                  $cloud.speed.actual += rand($cloud.speed.shiftRange * -1, $cloud.speed.shiftRange);
+              }
+              if ($cloud.speed.actual > $cloud.speed.max) {
+                return $cloud.speed.actual = $cloud.speed.max;
+              } else if ($cloud.speed.actual < $cloud.speed.min) {
+                return $cloud.speed.actual = $cloud.speed.min;
+              }
+            }
+          }
         },
         direction: {
           actual: 0,
@@ -165,24 +184,8 @@
           }
         },
         cloudRandomly: function() {
-          if ($cloud.speed.max !== $cloud.speed.min) {
-            switch ($cloud.speed.actual) {
-              case $cloud.speed.max:
-                $cloud.speed.actual -= rand(1, $cloud.speed.shiftRange);
-                break;
-              case $cloud.speed.min:
-                $cloud.speed.actual += rand(1, $cloud.speed.shiftRange);
-                break;
-              default:
-                $cloud.speed.actual += rand($cloud.speed.shiftRange * -1, $cloud.speed.shiftRange);
-            }
-            if ($cloud.speed.actual > $cloud.speed.max) {
-              $cloud.speed.actual = $cloud.speed.max;
-            } else if ($cloud.speed.actual < $cloud.speed.min) {
-              $cloud.speed.actual = $cloud.speed.min;
-            }
-          }
-          return $cloud.direction.actual += rand($cloud.direction.shiftRange * -1, $cloud.direction.shiftRange);
+          $cloud.direction.actual += rand($cloud.direction.shiftRange * -1, $cloud.direction.shiftRange);
+          return $cloud.speed.changeRandomly;
         }
       };
       wind = {

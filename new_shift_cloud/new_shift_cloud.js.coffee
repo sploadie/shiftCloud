@@ -13,7 +13,6 @@ $ ->
     
     $cloud =
       self: $this
-
       point:
         x: 0
         y: 0
@@ -24,13 +23,19 @@ $ ->
           $cloud.point.cssInput =
             left: "#{Math.floor($cloud.point.x)}px"
             top: "#{Math.floor($space.height - $cloud.point.y)}px"
-      
       speed:
         actual: 5
         max: 5
         min: 5
         shiftRange: 1
-
+        changeRandomly: ()->
+          unless $cloud.speed.max == $cloud.speed.min
+            switch $cloud.speed.actual
+              when $cloud.speed.max then $cloud.speed.actual -= rand(1, $cloud.speed.shiftRange)
+              when $cloud.speed.min then $cloud.speed.actual += rand(1, $cloud.speed.shiftRange)
+              else $cloud.speed.actual += rand(($cloud.speed.shiftRange * -1), $cloud.speed.shiftRange)
+            if $cloud.speed.actual > $cloud.speed.max then $cloud.speed.actual = $cloud.speed.max
+            else if $cloud.speed.actual < $cloud.speed.min then $cloud.speed.actual = $cloud.speed.min
       direction:
         actual: 0
         shiftRange: 10
@@ -58,7 +63,6 @@ $ ->
           if $cloud.direction.actual < 1
             $cloud.direction.actual += 360
             $cloud.direction.fix()
-      
       update: ()->
         $cloud.direction.fix()
         radians = $cloud.direction.actual * Math.PI / 180
@@ -68,7 +72,6 @@ $ ->
 
     $space =
       self: $cloud.self.offsetParent()
-
       realWidth: $cloud.self.offsetParent().outerWidth()
       realHeight: $cloud.self.offsetParent().outerHeight()
       width: $cloud.self.offsetParent().outerWidth() - $cloud.self.outerWidth()
@@ -80,7 +83,6 @@ $ ->
         right:  0
         bottom: 0
         left:   0
-
       setShiftLimits: ()->
         angle = 0
         distances = []
@@ -98,18 +100,14 @@ $ ->
           right:  $space.width  - shiftPadding
           bottom: shiftPadding
           left:   shiftPadding
-
       changeDir: 0
       dirMod:    0
-
       ClockwiseIf: (bool)->
         if bool is true then shift.changeDir -= shift.dirMod
         else shift.changeDir += shift.dirMod
-
       CounterclockwiseIf: (bool)->
         if bool is true then shift.changeDir += shift.dirMod
         else shift.changeDir -= shift.dirMod
-
       begin: ()->
         $cloud.direction.facing.check()
         shift.changeDir = 0
@@ -125,16 +123,9 @@ $ ->
           shift.ClockwiseIf $cloud.direction.facing.right
         if shift.changeDir isnt 0 then $cloud.direction.actual += shift.changeDir
         else shift.cloudRandomly()
-        
       cloudRandomly: ()->
-        unless $cloud.speed.max == $cloud.speed.min
-          switch $cloud.speed.actual
-            when $cloud.speed.max then $cloud.speed.actual -= rand(1, $cloud.speed.shiftRange)
-            when $cloud.speed.min then $cloud.speed.actual += rand(1, $cloud.speed.shiftRange)
-            else $cloud.speed.actual += rand(($cloud.speed.shiftRange * -1), $cloud.speed.shiftRange)
-          if $cloud.speed.actual > $cloud.speed.max then $cloud.speed.actual = $cloud.speed.max
-          else if $cloud.speed.actual < $cloud.speed.min then $cloud.speed.actual = $cloud.speed.min
         $cloud.direction.actual += rand(($cloud.direction.shiftRange * -1), $cloud.direction.shiftRange)
+        $cloud.speed.changeRandomly
 
     wind =
       
@@ -144,7 +135,6 @@ $ ->
         $cloud.point.y = rand(shift.shiftLimits.bottom, (shift.shiftLimits.top))
         $cloud.self.css $cloud.point.convertFormat()
         $cloud.direction.actual = rand(1, 360)
-      
       blowTheCloud: ()->
         shift.begin()
         $cloud.update()
