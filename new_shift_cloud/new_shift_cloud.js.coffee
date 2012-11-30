@@ -25,8 +25,8 @@ $ ->
             top: "#{Math.floor($space.height - $cloud.point.y)}px"
       speed:
         actual: 4 #Initial
-        max: 6
-        min: 3
+        max: 4
+        min: 2
         shiftRange: 1 #X2
 
       direction:
@@ -108,7 +108,7 @@ $ ->
           question
       superShift: ()->
         $cloud.direction.facing.check()
-        shiftPadding = $cloud.speed.actual * 3 #+ $cloud.direction.shiftRange #<=CHANGE THESE ACCORDING TO TESTS
+        shiftPadding = $cloud.speed.actual * 5 #+ $cloud.direction.shiftRange #<=CHANGE THESE ACCORDING TO TESTS
         shiftLimits =
           top: $space.height - shiftPadding
           right: $space.width - shiftPadding
@@ -185,7 +185,7 @@ $ ->
           console.log(limit) #
           console.log("#{$cloud.point.cssInput.left},#{$cloud.point.cssInput.top}") #
           
-          $cloud.self.animate $cloud.point.cssInput, 60, ->
+          $cloud.self.animate $cloud.point.cssInput, 30, ->
             wind.blowTheCloud()
     
     wind.initialize()

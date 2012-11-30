@@ -34,8 +34,8 @@
         },
         speed: {
           actual: 4,
-          max: 6,
-          min: 3,
+          max: 4,
+          min: 2,
           shiftRange: 1
         },
         direction: {
@@ -137,7 +137,7 @@
         superShift: function() {
           var corner, dirMod, shiftLimits, shiftPadding;
           $cloud.direction.facing.check();
-          shiftPadding = $cloud.speed.actual * 3;
+          shiftPadding = $cloud.speed.actual * 5;
           shiftLimits = {
             top: $space.height - shiftPadding,
             right: $space.width - shiftPadding,
@@ -215,7 +215,7 @@
           if (limit <= 1000) {
             console.log(limit);
             console.log("" + $cloud.point.cssInput.left + "," + $cloud.point.cssInput.top);
-            return $cloud.self.animate($cloud.point.cssInput, 60, function() {
+            return $cloud.self.animate($cloud.point.cssInput, 30, function() {
               return wind.blowTheCloud();
             });
           }
