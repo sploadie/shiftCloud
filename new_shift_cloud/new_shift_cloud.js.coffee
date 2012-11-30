@@ -13,6 +13,7 @@ $ ->
     
     $cloud =
       self: $this
+
       point:
         x: 0
         y: 0
@@ -82,6 +83,7 @@ $ ->
 
     $space =
       self: $cloud.self.offsetParent()
+
       realWidth: $cloud.self.offsetParent().outerWidth()
       realHeight: $cloud.self.offsetParent().outerHeight()
       width: $cloud.self.offsetParent().outerWidth() - $cloud.self.outerWidth()
@@ -159,9 +161,7 @@ $ ->
     
     wind =
       shift: ()->
-        
         $space.superShift()
-        
         $cloud.subShift()
       
       initialize: ()->
@@ -172,19 +172,14 @@ $ ->
         $space.setShiftLimits()
       
       blowTheCloud: ()->
-        
         wind.shift()
         $cloud.update()
-        
         limit += 1 #
         if limit <= 500 #
           console.log(limit) #
-          
           $cloud.self.animate $cloud.point.cssInput, 60, ->
             wind.blowTheCloud()
     
     wind.initialize()
-    
     limit = 0 #
-    
     wind.blowTheCloud($cloud, $space)
