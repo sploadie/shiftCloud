@@ -25,18 +25,17 @@ $ ->
             top: "#{Math.floor($space.height - $cloud.point.y)}px"
       
       speed:
-        actual: 4 #Initial
+        actual: 4
         max: 4
         min: 2
-        shiftRange: 1 #X2
+        shiftRange: 1
 
       direction:
         actual: 0
-        shiftRange: 10 #X2
+        shiftRange: 10
         facing:
           check: ()->
             $cloud.direction.fix()
-            #Update which two directions the cloud is "facing"
             $cloud.direction.facing.left = false; $cloud.direction.facing.right = false
             $cloud.direction.facing.up   = false; $cloud.direction.facing.down  = false
             if 90 < $cloud.direction.actual <= 270
@@ -60,39 +59,32 @@ $ ->
             $cloud.direction.fix()
       
       update: ()->
-        #Update the cloud point
         $cloud.direction.fix()
         radians = $cloud.direction.actual * Math.PI / 180
         $cloud.point.x += $cloud.speed.actual * Math.cos(radians)
         $cloud.point.y += $cloud.speed.actual * Math.sin(radians)
-        #Update
         $cloud.point.convertFormat()
       
       doCloudShift: true
       
       subShift: ()->
-        #Cloud does its thing if space didn't bother.
         if $cloud.doCloudShift == true
-          #Shift speed...
           switch $cloud.speed.actual
             when $cloud.speed.max then $cloud.speed.actual -= rand(1, $cloud.speed.shiftRange)
             when $cloud.speed.min then $cloud.speed.actual += rand(1, $cloud.speed.shiftRange)
             else $cloud.speed.actual += rand(($cloud.speed.shiftRange * -1), $cloud.speed.shiftRange)
-          #Check: doesn't apply until speed.shiftRange > 1
           if $cloud.speed.actual > $cloud.speed.max then $cloud.speed.actual = $cloud.speed.max
           else if $cloud.speed.actual < $cloud.speed.min then $cloud.speed.actual = $cloud.speed.min
-          #Shift direction...
           $cloud.direction.actual += rand(($cloud.direction.shiftRange * -1), $cloud.direction.shiftRange)
         else
-          #Reset doCloudShift for next check if it was false
           $cloud.doCloudShift = true
 
     $space =
       self: $cloud.self.offsetParent()
-      realWidth: $cloud.self.offsetParent().outerWidth() #Dependant on .self
-      realHeight: $cloud.self.offsetParent().outerHeight() #Dependant on .self
-      width: $cloud.self.offsetParent().outerWidth() - $cloud.self.outerWidth() #Dependant on .realWidth
-      height: $cloud.self.offsetParent().outerHeight() - $cloud.self.outerHeight() #Dependant on .realHeight
+      realWidth: $cloud.self.offsetParent().outerWidth()
+      realHeight: $cloud.self.offsetParent().outerHeight()
+      width: $cloud.self.offsetParent().outerWidth() - $cloud.self.outerWidth()
+      height: $cloud.self.offsetParent().outerHeight() - $cloud.self.outerHeight()
       
       cloudIsOn:
         thetop: ()->
@@ -140,8 +132,7 @@ $ ->
       superShift: ()->
         $cloud.direction.facing.check()
         corner = false
-        dirMod = $cloud.direction.shiftRange #<======================CHANGE THESE ACCORDING TO TESTS
-        #LEFT
+        dirMod = $cloud.direction.shiftRange
         if $cloud.point.x <= $space.shiftLimits.left   && $cloud.direction.facing.left
           console.log("BOO YEAH!") #
           $cloud.doCloudShift = false
@@ -150,7 +141,6 @@ $ ->
             $cloud.direction.actual -= dirMod
           else
             $cloud.direction.actual += dirMod
-        #RIGHT
         if $cloud.point.x >= $space.shiftLimits.right  && $cloud.direction.facing.right
           console.log("BOO YEAH!") #
           $cloud.doCloudShift = false
@@ -160,7 +150,6 @@ $ ->
           else
             $cloud.direction.actual -= dirMod
         if corner then dirMod = dirMod * -1
-        #BOTTOM
         if $cloud.point.y <= $space.shiftLimits.bottom && $cloud.direction.facing.down
           console.log("BOO YEAH!") #
           $cloud.doCloudShift = false
@@ -168,7 +157,6 @@ $ ->
             $cloud.direction.actual += dirMod
           else
             $cloud.direction.actual -= dirMod
-        #TOP
         if $cloud.point.y >= $space.shiftLimits.top    && $cloud.direction.facing.up
           console.log("BOO YEAH!") #
           $cloud.doCloudShift = false
@@ -195,7 +183,6 @@ $ ->
         $cloud.direction.actual = rand(1, 360)
         $space.setShiftLimits()
       
-      #Move loop
       blowTheCloud: ()->
         
         wind.shift()
