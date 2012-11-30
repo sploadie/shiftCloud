@@ -151,12 +151,18 @@
               })) + 1;
             }
           }
-          return $space.shiftLimits = {
+          $space.shiftLimits = {
             top: $space.height - shiftPadding,
             right: $space.width - shiftPadding,
             bottom: shiftPadding,
             left: shiftPadding
           };
+          return $("#space > #shiftPadding").css({
+            left: "" + $space.shiftLimits.left + "px",
+            top: "" + $space.shiftLimits.bottom + "px",
+            width: "" + ($space.shiftLimits.right - shiftPadding),
+            height: "" + ($space.shiftLimits.top - shiftPadding)
+          });
         },
         shiftLimits: {
           top: 0,
@@ -165,18 +171,11 @@
           left: 0
         },
         superShift: function() {
-          var corner, dirMod, shiftLimits, shiftPadding;
+          var corner, dirMod;
           $cloud.direction.facing.check();
-          shiftPadding = $cloud.speed.actual * 5;
-          shiftLimits = {
-            top: $space.height - shiftPadding,
-            right: $space.width - shiftPadding,
-            bottom: shiftPadding,
-            left: shiftPadding
-          };
           corner = false;
           dirMod = $cloud.direction.shiftRange;
-          if ($cloud.point.x <= shiftLimits.left && $cloud.direction.facing.left) {
+          if ($cloud.point.x <= $space.shiftLimits.left && $cloud.direction.facing.left) {
             console.log("BOO YEAH!");
             $cloud.doCloudShift = false;
             corner = true;
@@ -186,7 +185,7 @@
               $cloud.direction.actual += dirMod;
             }
           }
-          if ($cloud.point.x >= shiftLimits.right && $cloud.direction.facing.right) {
+          if ($cloud.point.x >= $space.shiftLimits.right && $cloud.direction.facing.right) {
             console.log("BOO YEAH!");
             $cloud.doCloudShift = false;
             corner = true;
@@ -199,7 +198,7 @@
           if (corner) {
             dirMod = dirMod * -1;
           }
-          if ($cloud.point.y <= shiftLimits.bottom && $cloud.direction.facing.down) {
+          if ($cloud.point.y <= $space.shiftLimits.bottom && $cloud.direction.facing.down) {
             console.log("BOO YEAH!");
             $cloud.doCloudShift = false;
             if ($cloud.direction.facing.right) {
@@ -208,7 +207,7 @@
               $cloud.direction.actual -= dirMod;
             }
           }
-          if ($cloud.point.y >= shiftLimits.top && $cloud.direction.facing.up) {
+          if ($cloud.point.y >= $space.shiftLimits.top && $cloud.direction.facing.up) {
             console.log("BOO YEAH!");
             $cloud.doCloudShift = false;
             if ($cloud.direction.facing.right) {
@@ -224,19 +223,14 @@
           $space.superShift();
           console.log("doCloudShift = " + $cloud.doCloudShift);
           $cloud.subShift();
-          console.log("Speed = " + $cloud.speed.actual + ", Direction = " + $cloud.direction.actual);
-          return $("#space > #shiftPadding").css({
-            left: "" + (Math.floor($cloud.speed.actual * 3)) + "px",
-            top: "" + (Math.floor($cloud.speed.actual * 3)) + "px",
-            width: "" + (Math.floor($space.width - ($cloud.speed.actual * 3) * 2.0)),
-            height: "" + (Math.floor($space.height - ($cloud.speed.actual * 3) * 2.0))
-          });
+          return console.log("Speed = " + $cloud.speed.actual + ", Direction = " + $cloud.direction.actual);
         },
         initialize: function() {
           $cloud.point.x = rand($cloud.speed.actual, $space.width - $cloud.speed.actual);
           $cloud.point.y = rand($cloud.speed.actual, $space.height - $cloud.speed.actual);
           $cloud.self.css($cloud.point.convertFormat());
-          return $cloud.direction.actual = rand(1, 360);
+          $cloud.direction.actual = rand(1, 360);
+          return $space.setShiftLimits();
         },
         blowTheCloud: function() {
           wind.shift();
