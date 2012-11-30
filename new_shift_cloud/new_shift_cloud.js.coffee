@@ -25,9 +25,9 @@ $ ->
             top: "#{Math.floor($space.height - $cloud.point.y)}px"
       
       speed:
-        actual: 4
-        max: 4
-        min: 2
+        actual: 5
+        max: 5
+        min: 5
         shiftRange: 1
 
       direction:
@@ -69,12 +69,13 @@ $ ->
       
       subShift: ()->
         if $cloud.doCloudShift == true
-          switch $cloud.speed.actual
-            when $cloud.speed.max then $cloud.speed.actual -= rand(1, $cloud.speed.shiftRange)
-            when $cloud.speed.min then $cloud.speed.actual += rand(1, $cloud.speed.shiftRange)
-            else $cloud.speed.actual += rand(($cloud.speed.shiftRange * -1), $cloud.speed.shiftRange)
-          if $cloud.speed.actual > $cloud.speed.max then $cloud.speed.actual = $cloud.speed.max
-          else if $cloud.speed.actual < $cloud.speed.min then $cloud.speed.actual = $cloud.speed.min
+          unless $cloud.speed.max == $cloud.speed.min
+            switch $cloud.speed.actual
+              when $cloud.speed.max then $cloud.speed.actual -= rand(1, $cloud.speed.shiftRange)
+              when $cloud.speed.min then $cloud.speed.actual += rand(1, $cloud.speed.shiftRange)
+              else $cloud.speed.actual += rand(($cloud.speed.shiftRange * -1), $cloud.speed.shiftRange)
+            if $cloud.speed.actual > $cloud.speed.max then $cloud.speed.actual = $cloud.speed.max
+            else if $cloud.speed.actual < $cloud.speed.min then $cloud.speed.actual = $cloud.speed.min
           $cloud.direction.actual += rand(($cloud.direction.shiftRange * -1), $cloud.direction.shiftRange)
         else
           $cloud.doCloudShift = true
@@ -117,11 +118,6 @@ $ ->
           right:  $space.width - shiftPadding
           bottom: shiftPadding
           left:   shiftPadding
-        $("#space > #shiftPadding").css #
-          left:   "#{$space.shiftLimits.left}px" #
-          top:    "#{$space.shiftLimits.bottom}px" #
-          width:  "#{$space.shiftLimits.right - shiftPadding}" #
-          height: "#{$space.shiftLimits.top - shiftPadding}" #
       
       shiftLimits:
         top:    0
@@ -134,7 +130,6 @@ $ ->
         corner = false
         dirMod = $cloud.direction.shiftRange
         if $cloud.point.x <= $space.shiftLimits.left   && $cloud.direction.facing.left
-          console.log("BOO YEAH!") #
           $cloud.doCloudShift = false
           corner = true
           if $cloud.direction.facing.up
@@ -142,7 +137,6 @@ $ ->
           else
             $cloud.direction.actual += dirMod
         if $cloud.point.x >= $space.shiftLimits.right  && $cloud.direction.facing.right
-          console.log("BOO YEAH!") #
           $cloud.doCloudShift = false
           corner = true
           if $cloud.direction.facing.up
@@ -151,14 +145,12 @@ $ ->
             $cloud.direction.actual -= dirMod
         if corner then dirMod = dirMod * -1
         if $cloud.point.y <= $space.shiftLimits.bottom && $cloud.direction.facing.down
-          console.log("BOO YEAH!") #
           $cloud.doCloudShift = false
           if $cloud.direction.facing.right
             $cloud.direction.actual += dirMod
           else
             $cloud.direction.actual -= dirMod
         if $cloud.point.y >= $space.shiftLimits.top    && $cloud.direction.facing.up
-          console.log("BOO YEAH!") #
           $cloud.doCloudShift = false
           if $cloud.direction.facing.right
             $cloud.direction.actual -= dirMod
@@ -170,11 +162,7 @@ $ ->
         
         $space.superShift()
         
-        console.log("doCloudShift = #{$cloud.doCloudShift}") #
-        
         $cloud.subShift()
-        
-        console.log("Speed = #{$cloud.speed.actual}, Direction = #{$cloud.direction.actual}") #
       
       initialize: ()->
         $cloud.point.x = rand($cloud.speed.actual, ($space.width-$cloud.speed.actual))
@@ -189,9 +177,8 @@ $ ->
         $cloud.update()
         
         limit += 1 #
-        if limit <= 1000 #
+        if limit <= 500 #
           console.log(limit) #
-          console.log("#{$cloud.point.cssInput.left},#{$cloud.point.cssInput.top}") #
           
           $cloud.self.animate $cloud.point.cssInput, 60, ->
             wind.blowTheCloud()
