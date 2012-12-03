@@ -88,10 +88,10 @@ $ ->
           angle += $cloud.direction.shiftRange
           if angle < 180
             radians = angle * (Math.PI / 180)
-            dist = Math.sin(radians)*$cloud.speed.actual
+            dist = Math.sin(radians) * $cloud.speed.max
             distances.push(dist)
           else
-            shiftPadding = Math.floor(distances.reduce (x,y) -> x + y) + 1
+            shiftPadding = Math.floor(distances.reduce (x,y) -> x + y) + 1 + $cloud.speed.max
         shift.shiftLimits =
           top:    $space.height - shiftPadding
           right:  $space.width  - shiftPadding

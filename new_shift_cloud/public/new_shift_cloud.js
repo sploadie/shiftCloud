@@ -124,12 +124,12 @@
             angle += $cloud.direction.shiftRange;
             if (angle < 180) {
               radians = angle * (Math.PI / 180);
-              dist = Math.sin(radians) * $cloud.speed.actual;
+              dist = Math.sin(radians) * $cloud.speed.max;
               distances.push(dist);
             } else {
               shiftPadding = Math.floor(distances.reduce(function(x, y) {
                 return x + y;
-              })) + 1;
+              })) + 1 + $cloud.speed.max;
             }
           }
           return shift.shiftLimits = {
