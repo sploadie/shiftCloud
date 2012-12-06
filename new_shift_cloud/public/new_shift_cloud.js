@@ -1,7 +1,7 @@
 (function() {
 
   $(function() {
-    var rand;
+    var CloudDriver, Position, SpeedGear, Vehicle, Wheel, rand;
     rand = function() {
       var max, min;
       if (arguments.length === 2) {
@@ -11,197 +11,190 @@
         min = 0;
         max = arguments[0];
       }
-      return Math.floor(Math.random() * ((max + 1) - min)) + min;
+      return Math.floor(Math.random() * (max - min + 1)) + min;
     };
+    Position = (function() {
+
+      function Position(x, y) {
+        this.x = x;
+        this.y = y;
+      }
+
+      Position.prototype.toCSS = function() {
+        return {
+          left: "" + (Math.floor(this.x)) + "px",
+          top: "" + (Math.floor(this.y)) + "px"
+        };
+      };
+
+      return Position;
+
+    })();
+    SpeedGear = (function() {
+
+      function SpeedGear(actual, min, max, shiftRange) {
+        this.actual = actual;
+        this.min = min;
+        this.max = max;
+        this.shiftRange = shiftRange;
+      }
+
+      SpeedGear.prototype.changeRandomly = function() {
+        if (this.max !== this.min) {
+          switch (this.actual) {
+            case this.max:
+              this.actual -= rand(1, this.shiftRange);
+              break;
+            case this.min:
+              this.actual += rand(1, this.shiftRange);
+              break;
+            default:
+              this.actual += rand(this.shiftRange * -1, this.shiftRange);
+          }
+          if (this.actual > this.max) {
+            return this.actual = this.max;
+          } else if (this.actual < this.min) {
+            return this.actual = this.min;
+          }
+        }
+      };
+
+      return SpeedGear;
+
+    })();
+    Wheel = (function() {
+
+      function Wheel(actual, shiftRange) {
+        this.shiftRange = shiftRange;
+        this.setActual(actual);
+      }
+
+      Wheel.prototype.setActual = function(value) {
+        return this.actual = (360 + value % 360) % 360;
+      };
+
+      Wheel.prototype.turnBy = function(value) {
+        return this.setActual(this.actual + value);
+      };
+
+      Wheel.prototype.turnRandomly = function() {
+        return this.turnBy(rand(this.shiftRange * -1, this.shiftRange));
+      };
+
+      Wheel.prototype.facingLeft = function() {
+        var _ref;
+        return (90 < (_ref = this.actual) && _ref <= 270);
+      };
+
+      Wheel.prototype.facingRight = function() {
+        return !this.facingLeft();
+      };
+
+      Wheel.prototype.facingUp = function() {
+        var _ref;
+        return (0 < (_ref = this.actual) && _ref <= 180);
+      };
+
+      Wheel.prototype.facingDown = function() {
+        return !this.facingUp();
+      };
+
+      return Wheel;
+
+    })();
+    Vehicle = (function() {
+
+      function Vehicle(self) {
+        this.self = self;
+        this.point = new Position(0, 0);
+        this.speed = new SpeedGear(5, 5, 5, 1);
+        this.direction = new Wheel(rand(1, 360), 10);
+      }
+
+      Vehicle.prototype.update = function() {
+        var radians;
+        radians = this.direction.actual * Math.PI / 180;
+        this.point.x += this.speed.actual * Math.cos(radians);
+        this.point.y += this.speed.actual * Math.sin(radians);
+        return this.point.toCSS();
+      };
+
+      return Vehicle;
+
+    })();
+    CloudDriver = (function() {
+
+      function CloudDriver(cloud) {
+        this.cloud = cloud;
+        this.constraint = this.cloud.self.offsetParent();
+        this.setShiftLimits();
+        this.cloud.point.x = rand(this.shiftLimits.left, this.shiftLimits.right);
+        this.cloud.point.y = rand(this.shiftLimits.bottom, this.shiftLimits.top);
+        this.cloud.self.css(this.cloud.point.toCSS());
+      }
+
+      CloudDriver.prototype.drive = function() {
+        var _this = this;
+        this.begin();
+        return this.cloud.self.animate(this.cloud.update(), 10, function() {
+          return _this.drive();
+        });
+      };
+
+      CloudDriver.prototype.setShiftLimits = function() {
+        var shiftPadding;
+        shiftPadding = Math.floor(this.cloud.speed.max / Math.sin((this.cloud.direction.shiftRange / 2) * (Math.PI / 180))) + this.cloud.speed.max;
+        return this.shiftLimits = {
+          top: this.constraint.outerHeight() - this.cloud.self.outerHeight() - shiftPadding,
+          right: this.constraint.outerWidth() - this.cloud.self.outerWidth() - shiftPadding,
+          bottom: shiftPadding,
+          left: shiftPadding
+        };
+      };
+
+      CloudDriver.prototype.clockwiseIf = function(bool) {
+        if (bool === true) {
+          return -1;
+        } else {
+          return 1;
+        }
+      };
+
+      CloudDriver.prototype.begin = function() {
+        var changeDir, dirMod;
+        changeDir = 0;
+        dirMod = this.cloud.direction.shiftRange;
+        if (this.cloud.point.x <= this.shiftLimits.left && this.cloud.direction.facingLeft()) {
+          changeDir += (this.clockwiseIf(this.cloud.direction.facingUp())) * dirMod;
+        }
+        if (this.cloud.point.x >= this.shiftLimits.right && this.cloud.direction.facingRight()) {
+          changeDir += (this.clockwiseIf(this.cloud.direction.facingDown())) * dirMod;
+        }
+        if (changeDir !== 0) {
+          dirMod = dirMod * -1;
+        }
+        if (this.cloud.point.y <= this.shiftLimits.bottom && this.cloud.direction.facingDown()) {
+          changeDir += (this.clockwiseIf(this.cloud.direction.facingLeft())) * dirMod;
+        }
+        if (this.cloud.point.y >= this.shiftLimits.top && this.cloud.direction.facingUp()) {
+          changeDir += (this.clockwiseIf(this.cloud.direction.facingRight())) * dirMod;
+        }
+        if (changeDir !== 0) {
+          return this.cloud.direction.turnBy(changeDir);
+        } else {
+          this.cloud.direction.turnRandomly();
+          return this.cloud.speed.changeRandomly();
+        }
+      };
+
+      return CloudDriver;
+
+    })();
     return $("#space img").each(function() {
-      var $cloud, $space, $this, shift, wind;
-      $this = $(this);
-      $cloud = {
-        self: $this,
-        point: {
-          x: 0,
-          y: 0,
-          convertFormat: function() {
-            var cssInput;
-            return cssInput = {
-              left: "" + (Math.floor($cloud.point.x)) + "px",
-              top: "" + (Math.floor($space.height - $cloud.point.y)) + "px"
-            };
-          }
-        },
-        speed: {
-          actual: 5,
-          max: 5,
-          min: 5,
-          shiftRange: 1,
-          changeRandomly: function() {
-            if ($cloud.speed.max !== $cloud.speed.min) {
-              switch ($cloud.speed.actual) {
-                case $cloud.speed.max:
-                  $cloud.speed.actual -= rand(1, $cloud.speed.shiftRange);
-                  break;
-                case $cloud.speed.min:
-                  $cloud.speed.actual += rand(1, $cloud.speed.shiftRange);
-                  break;
-                default:
-                  $cloud.speed.actual += rand($cloud.speed.shiftRange * -1, $cloud.speed.shiftRange);
-              }
-              if ($cloud.speed.actual > $cloud.speed.max) {
-                return $cloud.speed.actual = $cloud.speed.max;
-              } else if ($cloud.speed.actual < $cloud.speed.min) {
-                return $cloud.speed.actual = $cloud.speed.min;
-              }
-            }
-          }
-        },
-        direction: {
-          actual: 0,
-          shiftRange: 10,
-          facing: {
-            check: function() {
-              var _ref, _ref1;
-              $cloud.direction.fix();
-              $cloud.direction.facing.left = false;
-              $cloud.direction.facing.right = false;
-              $cloud.direction.facing.up = false;
-              $cloud.direction.facing.down = false;
-              if ((90 < (_ref = $cloud.direction.actual) && _ref <= 270)) {
-                $cloud.direction.facing.left = true;
-              } else {
-                $cloud.direction.facing.right = true;
-              }
-              if ((0 < (_ref1 = $cloud.direction.actual) && _ref1 <= 180)) {
-                return $cloud.direction.facing.up = true;
-              } else {
-                return $cloud.direction.facing.down = true;
-              }
-            },
-            up: false,
-            right: false,
-            down: false,
-            left: false
-          },
-          fix: function() {
-            if ($cloud.direction.actual > 360) {
-              $cloud.direction.actual -= 360;
-              $cloud.direction.fix();
-            }
-            if ($cloud.direction.actual < 1) {
-              $cloud.direction.actual += 360;
-              return $cloud.direction.fix();
-            }
-          }
-        },
-        update: function() {
-          var radians;
-          $cloud.direction.fix();
-          radians = $cloud.direction.actual * Math.PI / 180;
-          $cloud.point.x += $cloud.speed.actual * Math.cos(radians);
-          $cloud.point.y += $cloud.speed.actual * Math.sin(radians);
-          return $cloud.point.convertFormat();
-        }
-      };
-      $space = {
-        self: $cloud.self.offsetParent(),
-        realWidth: $cloud.self.offsetParent().outerWidth(),
-        realHeight: $cloud.self.offsetParent().outerHeight(),
-        width: $cloud.self.offsetParent().outerWidth() - $cloud.self.outerWidth(),
-        height: $cloud.self.offsetParent().outerHeight() - $cloud.self.outerHeight()
-      };
-      shift = {
-        shiftLimits: {
-          top: 0,
-          right: 0,
-          bottom: 0,
-          left: 0
-        },
-        setShiftLimits: function() {
-          var angle, dist, distances, radians, shiftPadding;
-          angle = 0;
-          distances = [];
-          shiftPadding = 0;
-          while (angle < 180) {
-            angle += $cloud.direction.shiftRange;
-            if (angle < 180) {
-              radians = angle * (Math.PI / 180);
-              dist = Math.sin(radians) * $cloud.speed.max;
-              distances.push(dist);
-            } else {
-              shiftPadding = Math.floor(distances.reduce(function(x, y) {
-                return x + y;
-              })) + 1 + $cloud.speed.max;
-            }
-          }
-          return shift.shiftLimits = {
-            top: $space.height - shiftPadding,
-            right: $space.width - shiftPadding,
-            bottom: shiftPadding,
-            left: shiftPadding
-          };
-        },
-        changeDir: 0,
-        dirMod: 0,
-        ClockwiseIf: function(bool) {
-          if (bool === true) {
-            return shift.changeDir -= shift.dirMod;
-          } else {
-            return shift.changeDir += shift.dirMod;
-          }
-        },
-        CounterclockwiseIf: function(bool) {
-          if (bool === true) {
-            return shift.changeDir += shift.dirMod;
-          } else {
-            return shift.changeDir -= shift.dirMod;
-          }
-        },
-        begin: function() {
-          $cloud.direction.facing.check();
-          shift.changeDir = 0;
-          shift.dirMod = $cloud.direction.shiftRange;
-          if ($cloud.point.x <= shift.shiftLimits.left && $cloud.direction.facing.left) {
-            shift.ClockwiseIf($cloud.direction.facing.up);
-          }
-          if ($cloud.point.x >= shift.shiftLimits.right && $cloud.direction.facing.right) {
-            shift.CounterclockwiseIf($cloud.direction.facing.up);
-          }
-          if (shift.changeDir !== 0) {
-            shift.dirMod = shift.dirMod * -1;
-          }
-          if ($cloud.point.y <= shift.shiftLimits.bottom && $cloud.direction.facing.down) {
-            shift.CounterclockwiseIf($cloud.direction.facing.right);
-          }
-          if ($cloud.point.y >= shift.shiftLimits.top && $cloud.direction.facing.up) {
-            shift.ClockwiseIf($cloud.direction.facing.right);
-          }
-          if (shift.changeDir !== 0) {
-            return $cloud.direction.actual += shift.changeDir;
-          } else {
-            return shift.cloudRandomly();
-          }
-        },
-        cloudRandomly: function() {
-          $cloud.direction.actual += rand($cloud.direction.shiftRange * -1, $cloud.direction.shiftRange);
-          return $cloud.speed.changeRandomly;
-        }
-      };
-      wind = {
-        initialize: function() {
-          shift.setShiftLimits();
-          $cloud.point.x = rand(shift.shiftLimits.left, shift.shiftLimits.right);
-          $cloud.point.y = rand(shift.shiftLimits.bottom, shift.shiftLimits.top);
-          $cloud.self.css($cloud.point.convertFormat());
-          return $cloud.direction.actual = rand(1, 360);
-        },
-        blowTheCloud: function() {
-          shift.begin();
-          return $cloud.self.animate($cloud.update(), 60, function() {
-            return wind.blowTheCloud();
-          });
-        }
-      };
-      wind.initialize();
-      return wind.blowTheCloud($cloud, $space);
+      var $cloud, driver;
+      $cloud = $(this);
+      driver = new CloudDriver(new Vehicle($cloud));
+      return driver.drive();
     });
   });
 
